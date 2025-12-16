@@ -1,0 +1,55 @@
+def tinh_pfes_du_lich_rung(
+    doanh_thu_quy,
+    ty_le_chi_tra=0.01
+):
+    """
+    Tính chi trả dịch vụ môi trường rừng (PFES)
+    cho hoạt động du lịch sinh thái, nghỉ dưỡng, giải trí trong rừng
+
+    Căn cứ pháp lý:
+    - Nghị định 99/2010/NĐ-CP
+    - Nghị định 156/2018/NĐ-CP (Điều 58, 59)
+
+    Tham số:
+    - doanh_thu_quy: list doanh thu theo ngày trong quý
+                    Mỗi phần tử là dict có các khóa: 'luu_tru', 'phong_nghi',
+                    'an_uong', 'di_lai_noi_khu', 'mua_sam'
+    - ty_le_chi_tra: tối thiểu 1% theo quy định pháp luật
+
+    Trả về:
+    - dict: {
+            'tong_doanh_thu_quy': float,
+            'ty_le_chi_tra': float,
+            'so_tien_pfes': float
+        }
+    """
+
+    # Kiểm tra tham số
+    if not isinstance(doanh_thu_quy, list):
+        raise ValueError("doanh_thu_quy phải là danh sách (list) các ngày")
+
+    if ty_le_chi_tra < 0.01:
+        raise ValueError("ty_le_chi_tra phải ≥ 1% (0.01) theo quy định pháp luật")
+
+    tong_doanh_thu_hop_le = 0.0
+
+    for ngay in doanh_thu_quy:
+        if not isinstance(ngay, dict):
+            raise ValueError(f"Mỗi phần tử trong doanh_thu_quy phải là dict, nhưng nhận được {type(ngay)}")
+
+        doanh_thu_ngay = (
+            ngay.get("luu_tru", 0)
+            + ngay.get("phong_nghi", 0)
+            + ngay.get("an_uong", 0)
+            + ngay.get("di_lai_noi_khu", 0)
+            + ngay.get("mua_sam", 0)
+        )
+        tong_doanh_thu_hop_le += doanh_thu_ngay
+
+    so_tien_pfes = tong_doanh_thu_hop_le * ty_le_chi_tra
+
+    return {
+        "tong_doanh_thu_quy": round(tong_doanh_thu_hop_le, 2),
+        "ty_le_chi_tra": ty_le_chi_tra,
+        "so_tien_pfes": round(so_tien_pfes, 2)
+    }
